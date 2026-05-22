@@ -2,7 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.apicurio</groupId>
+	<groupId>io.apitomy</groupId>
 	<artifactId>jsweet-maven-plugin</artifactId>
 	<version>3.1.2-SNAPSHOT</version>
 	<name>JSweet maven plugin</name>
@@ -52,9 +52,9 @@
 		<system>GitHub Issues</system>
 	</issueManagement>
 	<scm>
-		<url>https://github.com/Apicurio/jsweet-maven-plugin</url>
-		<connection>scm:git:git://github.com/Apicurio/jsweet-maven-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:Apicurio/jsweet-maven-plugin.git</developerConnection>
+		<url>https://github.com/Apitomy/jsweet-maven-plugin</url>
+		<connection>scm:git:git://github.com/Apitomy/jsweet-maven-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:Apitomy/jsweet-maven-plugin.git</developerConnection>
 	</scm>
 
 	<build>

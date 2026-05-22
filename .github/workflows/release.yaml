@@ -2,85 +2,64 @@ name: Release Workflow
 on:
   workflow_dispatch:
     inputs:
-      release-version:
-        description: 'Version being released'
-        required: true
-      snapshot-version:
-        description: 'Next snapshot version'
-        required: true
       branch:
         description: 'Branch to release from'
-        required: true
+        required: false
         default: 'main'
+
+permissions:
+  id-token: write
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'Apicurio'
+    if: github.repository_owner == 'Apitomy'
+    outputs:
+      release-version: ${{ steps.versions.outputs.release-version }}
+      snapshot-version: ${{ steps.versions.outputs.snapshot-version }}
     steps:
-
-      - uses: actions/setup-java@v3
+      - name: 'Checkout'
+        uses: actions/checkout@v6
         with:
-          distribution: 'adopt'
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
           java-version: '11'
 
-
-      - name: Check Java Version
-        run: java -version
-
-
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4
-        with:
-          maven-version: '3.8.5'
-
-
-      - name: Check Maven Version
-        run: mvn --version
-
-
-      - name: Log Metadata
+      - name: Configure Git
         run: |
-          echo "Releasing JSWeet Maven Plugin version ${{ github.event.inputs.release-version }} from branch ${{ github.event.inputs.branch }}"
-          echo "Next Snapshot version will be ${{ github.event.inputs.snapshot-version }}"
+          git config user.name "apitomy-ci"
+          git config user.email "apitomy.ci@gmail.com"
 
 
       - name: Set up settings.xml
         run: |
-          echo "<settings><servers><server><id>central</id><username>${{ secrets.CENTRAL_USERNAME }}</username><password>${{ secrets.CENTRAL_TOKEN }}</password></server></servers><profiles><profile><id>central</id><activation><activeByDefault>true</activeByDefault></activation><properties><gpg.executable>gpg</gpg.executable><gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase></properties></profile></profiles></settings>" > /home/runner/.m2/settings.xml
+          echo "<settings><servers><server><id>central</id><username>${{ secrets.CENTRAL_USERNAME }}</username><password>${{ secrets.CENTRAL_TOKEN }}</password></server></servers><profiles><profile><id>central</id><activation><activeByDefault>true</activeByDefault></activation><properties><gpg.executable>gpg</gpg.executable></properties></profile></profiles></settings>" > /home/runner/.m2/settings.xml
           cat /home/runner/.m2/settings.xml
 
 
-      - name: Cache Dependencies
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2/repository                               
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-
-      - name: JSWeet Maven Plugin Code Checkout
+      - name: Compute Release and Snapshot Versions
+        id: versions
         run: |
-          git init
-          git config --global user.name "apicurio-ci"
-          git config --global user.email "apicurio.ci@gmail.com"
-          git remote add origin "https://apicurio-ci:${{ secrets.ACCESS_TOKEN }}@github.com/$GITHUB_REPOSITORY.git"
-          git fetch
-          git checkout ${{ github.event.inputs.branch}}
-          git branch --set-upstream-to=origin/${{ github.event.inputs.branch}}
-          git pull
-          echo "#### Listing files after clone ####"
-          find .
-
-      
-      # To avoid permission denied issues 
-      - name: Give full Permissions
-        run: chmod -R 777 $(pwd)
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          RELEASE_VERSION="${CURRENT_VERSION%-SNAPSHOT}"
+          MAJOR=$(echo "$RELEASE_VERSION" | cut -d. -f1)
+          MINOR=$(echo "$RELEASE_VERSION" | cut -d. -f2)
+          PATCH=$(echo "$RELEASE_VERSION" | cut -d. -f3)
+          NEXT_PATCH=$((PATCH + 1))
+          SNAPSHOT_VERSION="${MAJOR}.${MINOR}.${NEXT_PATCH}-SNAPSHOT"
+          echo "release-version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "snapshot-version=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Release version: $RELEASE_VERSION"
+          echo "Next snapshot version: $SNAPSHOT_VERSION"
 
 
-      - name: Update Release Version ${{ github.event.inputs.release-version}}
-        run: mvn versions:set -DnewVersion=${{ github.event.inputs.release-version}} -DgenerateBackupPoms=false -DprocessAllModules=true
+      - name: Update Release Version ${{ steps.versions.outputs.release-version }}
+        run: mvn versions:set -DnewVersion=${{ steps.versions.outputs.release-version }} -DgenerateBackupPoms=false -DprocessAllModules=true
 
 
       - name: Verify Build
@@ -90,36 +69,92 @@ jobs:
       - name: Commit Release Version Change
         run: |
           git add .
-          git commit -m "Automated version update: ${{ github.event.inputs.release-version}}"
+          git commit -m "Automated version update: ${{ steps.versions.outputs.release-version }}"
           git push
 
 
-      - name: Import GPG Key
-        uses: crazy-max/ghaction-import-gpg@v1
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          
-
       - name: Create GitHub Release
-        run: ./.github/scripts/create-github-release.sh ${{ github.event.inputs.release-version}} ${{ github.event.inputs.branch}} $GITHUB_REPOSITORY ${{ secrets.ACCESS_TOKEN }}
-
-
-      - name: Maven Deploy
         run: |
-          # Retry 3 times before the steps actually fails
-          (echo "===== Maven Deploy Attempt: 1 ====" && mvn deploy -Prelease --batch-mode --settings /home/runner/.m2/settings.xml -DskipTests) || \
-          (echo "===== Maven Deploy Attempt 1 Failed - Sleeping for 30 minutes ====" && sleep 30m && echo "===== Maven Deploy Attempt: 2 ====" && mvn deploy -Prelease --batch-mode --settings /home/runner/.m2/settings.xml -DskipTests) || \
-          (echo "===== Maven Deploy Attempt 2 Failed - Sleeping for 30 minutes ====" && sleep 30m && echo "===== Maven Deploy Attempt: 3 ====" && mvn deploy -Prelease --batch-mode --settings /home/runner/.m2/settings.xml -DskipTests) || \
-          (echo "==== Maven Deploy Step Failed ====" && exit 1)
+          gh release create "${{ steps.versions.outputs.release-version }}" \
+            --target "${{ inputs.branch }}" \
+            --title "${{ steps.versions.outputs.release-version }}" \
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 
-      - name: Update Snapshot version ${{ github.event.inputs.snapshot-version}}
-        run: mvn versions:set -DnewVersion=${{ github.event.inputs.snapshot-version}} -DgenerateBackupPoms=false -DprocessAllModules=true
+  maven-publish:
+    needs: release
+    uses: ./.github/workflows/maven-publish.yaml
+    with:
+      release-version: ${{ needs.release.outputs.release-version }}
+      branch: ${{ inputs.branch }}
+    secrets: inherit
+
+
+  finalize:
+    needs: [release, maven-publish]
+    runs-on: ubuntu-latest
+    if: always() && needs.release.result == 'success'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Configure Git
+        run: |
+          git config user.name "apitomy-ci"
+          git config user.email "apitomy.ci@gmail.com"
+          git pull
+
+
+      - name: Update Snapshot version ${{ needs.release.outputs.snapshot-version }}
+        run: mvn versions:set -DnewVersion=${{ needs.release.outputs.snapshot-version }} -DgenerateBackupPoms=false -DprocessAllModules=true
 
 
       - name: Commit Snapshot Version Change
         run: |
-          git add pom.xml
-          git commit -m"Automated version update: ${{ github.event.inputs.snapshot-version}}"
+          git add .
+          git commit -m "Automated version update: ${{ needs.release.outputs.snapshot-version }}"
           git push
+
+
+      - name: Check Publishing Results
+        run: |
+          echo "Release workflow completed"
+          echo "Maven publish status: ${{ needs.maven-publish.result }}"
+          if [[ "${{ needs.maven-publish.result }}" != "success" ]]; then
+            echo "WARNING: Maven publish failed. You can retry it manually:"
+            echo "  https://github.com/${{ github.repository }}/actions/workflows/maven-publish.yaml"
+          fi
+
+
+      - name: Slack Notification (Always)
+        if: always()
+        run: |
+          MAVEN_STATUS="${{ needs.maven-publish.result }}"
+          if [[ "$MAVEN_STATUS" != "success" ]]; then
+            MESSAGE="Release ${{ needs.release.outputs.release-version }} completed with warnings. Maven: $MAVEN_STATUS. Manual retry may be needed."
+          else
+            MESSAGE="Release ${{ needs.release.outputs.release-version }} completed successfully"
+          fi
+          REPO="${{ github.repository }}"
+          LINK="https://github.com/$REPO/actions/runs/${{ github.run_id }}"
+          PAYLOAD="{\"workflow\": \"${{ github.workflow }}\", \"status\": \"${{ job.status }}\", \"message\": \"$MESSAGE\", \"link\": \"$LINK\", \"repository\": \"$REPO\"}"
+          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" ${{ secrets.SLACK_NOTIFICATION_WEBHOOK }}
+
+      - name: Slack Notification (Publishing Failures)
+        if: needs.maven-publish.result != 'success'
+        run: |
+          MESSAGE="Release ${{ needs.release.outputs.release-version }}: Maven publish failed (${{ needs.maven-publish.result }}). Retry at https://github.com/${{ github.repository }}/actions/workflows/maven-publish.yaml"
+          REPO="${{ github.repository }}"
+          LINK="https://github.com/$REPO/actions/runs/${{ github.run_id }}"
+          PAYLOAD="{\"workflow\": \"${{ github.workflow }}\", \"status\": \"warning\", \"message\": \"$MESSAGE\", \"link\": \"$LINK\", \"repository\": \"$REPO\"}"
+          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" ${{ secrets.SLACK_ERROR_WEBHOOK }}
