@@ -1,6 +1,27 @@
-# JSweet maven plugin
+# JSweet Maven Plugin
 
-Unleash the power of JSweet into your maven project
+A Maven plugin for [JSweet](http://www.jsweet.org) Java-to-TypeScript/JavaScript transpilation,
+maintained by [Apitomy](https://www.apitomy.io).
+
+## About This Fork
+
+This project is a fork of the original
+[jsweet-maven-plugin](https://github.com/lgrignon/jsweet-maven-plugin) by Louis Grignon. It was
+forked because the original JSweet artifact repository (`repository.jsweet.org`) is no longer
+available, which broke builds for all downstream consumers.
+
+This fork resolves the issue by inlining the two JSweet extension dependencies that were only
+available from the defunct repository:
+
+- **`sourcemap-builder`** — a source map generation library forked from Google Closure Compiler
+  (originally `org.jsweet.ext:sourcemap-builder`, source from
+  [lgrignon/sourcemap-builder](https://github.com/lgrignon/sourcemap-builder))
+- **`typescript-java-ts-core`** — a TypeScript language service client for Java (originally
+  `org.jsweet.ext:typescript.java-ts.core`, source from the
+  [cincheo/jsweet](https://github.com/cincheo/jsweet) monorepo)
+
+All three modules are published to Maven Central under `io.apitomy`, so no custom plugin
+repositories are needed.
 
 ## Table of Contents
 1. [Basic Configuration](#basic-configuration)
@@ -10,22 +31,8 @@ Unleash the power of JSweet into your maven project
 
 ## Basic Configuration ##
 
-Add the JSweet's plugin repositories to your project's pom.xml:
-```xml
-<pluginRepositories>
-	<pluginRepository>
-		<id>jsweet-plugins-release</id>
-		<name>plugins-release</name>
-		<url>http://repository.jsweet.org/artifactory/plugins-release-local</url>
-	</pluginRepository>
-	<pluginRepository>
-		<snapshots />
-		<id>jsweet-plugins-snapshots</id>
-		<name>plugins-snapshot</name>
-		<url>http://repository.jsweet.org/artifactory/plugins-snapshot-local</url>
-	</pluginRepository>
-</pluginRepositories>
-```
+The plugin is published to Maven Central under `io.apitomy`. No additional plugin
+repositories are needed.
 
 Configure your pom's sourceDirectory, as usual:
 ```xml
@@ -46,9 +53,9 @@ Add your JSweet dependencies (candies):
 Enable the JSweet transpiler plugin for the preferred phase (here, generate-sources):
 ```xml
 <plugin>
-	<groupId>org.jsweet</groupId>
+	<groupId>io.apitomy</groupId>
 	<artifactId>jsweet-maven-plugin</artifactId>
-	<version>3.0.0</version>
+	<version>3.1.2</version>
 	<configuration>
 		<outDir>javascript</outDir>
 		<targetVersion>ES6</targetVersion>
@@ -125,9 +132,9 @@ your application. For instance, a node server and a HTML5 client app:
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.jsweet</groupId>
+						<groupId>io.apitomy</groupId>
 						<artifactId>jsweet-maven-plugin</artifactId>
-						<version>3.0.0</version>
+						<version>3.1.2</version>
 						<configuration>
 							<outFile>client/out.js</outFile>
 							<targetVersion>ES6</targetVersion>
@@ -156,9 +163,9 @@ your application. For instance, a node server and a HTML5 client app:
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.jsweet</groupId>
+						<groupId>io.apitomy</groupId>
 						<artifactId>jsweet-maven-plugin</artifactId>
-						<version>3.0.0</version>
+						<version>3.1.2</version>
 						<configuration>
 							<outFile>server/full.js</outFile>
 							<module>commonjs</module>
@@ -219,9 +226,9 @@ To let JSweet use a non default source directory, the compileSourceRootsOverride
             </executions>
         </plugin>
         <plugin>
-            <groupId>org.jsweet</groupId>
+            <groupId>io.apitomy</groupId>
             <artifactId>jsweet-maven-plugin</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.2</version>
             <configuration>
                 <compileSourceRootsOverride>
                     <compileSourceRoot>target/generated-sources/delombok</compileSourceRoot>

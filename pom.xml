@@ -1,260 +1,131 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.apitomy</groupId>
-	<artifactId>jsweet-maven-plugin</artifactId>
-	<version>3.1.2-SNAPSHOT</version>
-	<name>JSweet maven plugin</name>
-	<description>JSweet maven plugin providing build and clean operations of JSweet sources</description>
-	<url>http://www.jsweet.org</url>
-	<packaging>maven-plugin</packaging>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<properties>
-		<jsweet.transpiler.version>3.1.0</jsweet.transpiler.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version.release>11</java.version.release>
-		<java.version>1.${java.version.release}</java.version>
-		<maven.version>3.6.3</maven.version>
-		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
-		<timestamp>${maven.build.timestamp}</timestamp>
+    <groupId>io.apitomy</groupId>
+    <artifactId>jsweet-parent</artifactId>
+    <version>3.1.2-SNAPSHOT</version>
+    <name>JSweet Parent</name>
+    <description>JSweet maven plugin and inlined dependencies</description>
+    <url>https://github.com/Apitomy/jsweet-maven-plugin</url>
+    <packaging>pom</packaging>
 
-        <version.org.sonatype.central-publishing-maven-plugin>0.7.0</version.org.sonatype.central-publishing-maven-plugin>
-        <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version.release>11</java.version.release>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
-	<developers>
-		<developer>
-			<id>lgrignon</id>
-			<name>Louis Grignon</name>
-			<email>louis.grignon@gmail.com</email>
-		</developer>
-		<developer>
-			<id>broken</id>
-			<name>Eric Ponthiaux</name>
-			<email>ponthiaux.eric@gmail.com</email>
-		</developer>
+        <jsweet.transpiler.version>3.1.0</jsweet.transpiler.version>
+        <maven.version>3.6.3</maven.version>
+        <version.gson>2.8.6</version.gson>
+        <version.minimal-json>0.9.4</version.minimal-json>
+        <version.xz>1.8</version.xz>
+        <version.osgi-core>4.3.0</version.osgi-core>
+        <version.commons-lang3>3.9</version.commons-lang3>
+
+        <version.maven-compiler-plugin>3.15.0</version.maven-compiler-plugin>
+        <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
+        <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
+        <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
+        <version.org.sonatype.central-publishing-maven-plugin>0.10.0</version.org.sonatype.central-publishing-maven-plugin>
+    </properties>
+
+    <modules>
+        <module>sourcemap-builder</module>
+        <module>typescript-java-ts-core</module>
+        <module>plugin</module>
+    </modules>
+
+    <developers>
+        <developer>
+            <id>lgrignon</id>
+            <name>Louis Grignon</name>
+            <email>louis.grignon@gmail.com</email>
+        </developer>
         <developer>
             <id>EricWittmann</id>
             <name>Eric Wittmann</name>
             <email>eric.wittmann@gmail.com</email>
         </developer>
-	</developers>
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<issueManagement>
-		<url>https://github.com/lgrignon/jsweet-maven-plugin/issues</url>
-		<system>GitHub Issues</system>
-	</issueManagement>
-	<scm>
-		<url>https://github.com/Apitomy/jsweet-maven-plugin</url>
-		<connection>scm:git:git://github.com/Apitomy/jsweet-maven-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:Apitomy/jsweet-maven-plugin.git</developerConnection>
-	</scm>
+    </developers>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<release>${java.version.release}</release>
-					<compilerVersion>${java.version}</compilerVersion>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.6.0</version>
-				<configuration>
-					<!-- see http://jira.codehaus.org/browse/MNG-5346 -->
-					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+    <issueManagement>
+        <url>https://github.com/Apitomy/jsweet-maven-plugin/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
 
-					<goalPrefix>jsweet</goalPrefix>
-				</configuration>
+    <scm>
+        <url>https://github.com/Apitomy/jsweet-maven-plugin</url>
+        <connection>scm:git:git://github.com/Apitomy/jsweet-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:Apitomy/jsweet-maven-plugin.git</developerConnection>
+    </scm>
 
-				<executions>
-					<execution>
-						<id>mojo-descriptor</id>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>help-descriptor</id>
-						<goals>
-							<goal>helpmojo</goal>
-						</goals>
-						<phase>process-classes</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.3</version>
-				<configuration>
-					<javadocVersion>1.8</javadocVersion>
-					<sourcepath>src/main/java</sourcepath>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<skip>${skipJavadoc}</skip>
-					<fixTags>all</fixTags>
-					<failOnError>false</failOnError>
-					<destDir>jsweet-maven-plugin-${project.version}</destDir>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-plugin-plugin</artifactId>
-										<versionRange>
-											[3.3,)
-										</versionRange>
-										<goals>
-											<goal>descriptor</goal>
-											<goal>helpmojo</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-compat</artifactId>
-			<version>${maven.version}</version>
-		</dependency>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${version.maven-compiler-plugin}</version>
+                <configuration>
+                    <release>${java.version.release}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${version.maven-source-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${version.maven-javadoc-plugin}</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-		<dependency>
-			<groupId>org.jsweet</groupId>
-			<artifactId>jsweet-transpiler</artifactId>
-			<version>${jsweet.transpiler.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.4</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
-
-
-
-	<profiles>
+    <profiles>
         <profile>
             <id>release</id>
             <build>
                 <plugins>
-					<plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <source>11</source>
-                                    <doclint>none</doclint>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
-						<artifactId>central-publishing-maven-plugin</artifactId>
-						<version>${version.org.sonatype.central-publishing-maven-plugin}</version>
-						<extensions>true</extensions>
-						<configuration>
-							<publishingServerId>central</publishingServerId>
-							<waitUntil>published</waitUntil>
-							<autoPublish>true</autoPublish>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${version.org.sonatype.central-publishing-maven-plugin}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <waitUntil>published</waitUntil>
+                            <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -269,7 +140,7 @@
                                     <goal>sign</goal>
                                 </goals>
                                 <configuration>
-                                    <!-- Prevent `gpg` from using pinentry programs -->
+                                    <passphraseEnvName>MAVEN_GPG_PASSPHRASE</passphraseEnvName>
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
                                         <arg>loopback</arg>
@@ -282,4 +153,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>
