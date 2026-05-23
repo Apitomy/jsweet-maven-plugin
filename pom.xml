@@ -5,7 +5,7 @@
 
     <groupId>io.apitomy</groupId>
     <artifactId>jsweet-parent</artifactId>
-    <version>3.1.2-SNAPSHOT</version>
+    <version>3.1.2</version>
     <name>JSweet Parent</name>
     <description>JSweet maven plugin and inlined dependencies</description>
     <url>https://github.com/Apitomy/jsweet-maven-plugin</url>
