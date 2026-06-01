@@ -1,3 +1,5 @@
+[![Verify Build Workflow](https://github.com/Apitomy/jsweet-maven-plugin/actions/workflows/verify.yaml/badge.svg)](https://github.com/Apitomy/jsweet-maven-plugin/actions/workflows/verify.yaml?query=branch%3Amain)
+
 # JSweet Maven Plugin
 
 A Maven plugin for [JSweet](http://www.jsweet.org) Java-to-TypeScript/JavaScript transpilation,
