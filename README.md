@@ -250,3 +250,17 @@ To let JSweet use a non default source directory, the compileSourceRootsOverride
     </plugins>
 </build>
 ```
+
+## Links
+
+- [Maven Central](https://central.sonatype.com/artifact/io.apitomy/jsweet-maven-plugin)
+- [GitHub Repository](https://github.com/Apitomy/jsweet-maven-plugin)
+- [Apitomy Website](https://www.apitomy.io)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
