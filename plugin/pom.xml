@@ -18,7 +18,7 @@
         <dependency>
             <groupId>io.apitomy</groupId>
             <artifactId>jsweet-transpiler</artifactId>
-            <version>3.1.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
