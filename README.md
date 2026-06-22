@@ -12,17 +12,25 @@ This project is a fork of the original
 forked because the original JSweet artifact repository (`repository.jsweet.org`) is no longer
 available, which broke builds for all downstream consumers.
 
-This fork resolves the issue by inlining the two JSweet extension dependencies that were only
-available from the defunct repository:
+This fork resolves the issue by inlining the JSweet dependencies that were only
+available from the defunct repository, and includes patches for JDK 17+ compatibility.
 
-- **`sourcemap-builder`** — a source map generation library forked from Google Closure Compiler
-  (originally `org.jsweet.ext:sourcemap-builder`, source from
-  [lgrignon/sourcemap-builder](https://github.com/lgrignon/sourcemap-builder))
-- **`typescript-java-ts-core`** — a TypeScript language service client for Java (originally
-  `org.jsweet.ext:typescript.java-ts.core`, source from the
-  [cincheo/jsweet](https://github.com/cincheo/jsweet) monorepo)
+### Inlined Modules
 
-All three modules are published to Maven Central under `io.apitomy`, so no custom plugin
+| Module | Original coordinates | Source | Base commit/version |
+|--------|---------------------|--------|-------------------|
+| **`sourcemap-builder`** | `org.jsweet.ext:sourcemap-builder:1.0.0` | [lgrignon/sourcemap-builder](https://github.com/lgrignon/sourcemap-builder) | `v1.0.0` (2017) |
+| **`typescript-java-ts-core`** | `org.jsweet.ext:typescript.java-ts.core:2.0.3` | [cincheo/jsweet](https://github.com/cincheo/jsweet) `typescript.java-ts.core/` | Tag `v3.1.0` ([`3febc4c`](https://github.com/cincheo/jsweet/commit/3febc4ca94c3e7db0e3c2f2b8fa6b28098a00dc3)) |
+| **`transpiler`** | `org.jsweet:jsweet-transpiler:3.1.0` | [cincheo/jsweet](https://github.com/cincheo/jsweet) `transpiler/` | Tag `v3.1.0` ([`3febc4c`](https://github.com/cincheo/jsweet/commit/3febc4ca94c3e7db0e3c2f2b8fa6b28098a00dc3)) |
+
+### Patches Applied
+
+- **`transpiler/Util.java`**: Fixed `getElement(Tree)` to return `null` for tree types without
+  a `sym` field (e.g., `JCBinary`) instead of crashing with
+  `Fatal error - cannot access legacy Javac API`. This fixes JDK 17.0.19+ / 21.0.11+
+  compatibility.
+
+All four modules are published to Maven Central under `io.apitomy`, so no custom plugin
 repositories are needed.
 
 ## Table of Contents

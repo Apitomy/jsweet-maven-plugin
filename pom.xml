@@ -35,6 +35,7 @@
     <modules>
         <module>sourcemap-builder</module>
         <module>typescript-java-ts-core</module>
+        <module>transpiler</module>
         <module>plugin</module>
     </modules>
 

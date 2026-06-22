@@ -16,19 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jsweet</groupId>
+            <groupId>io.apitomy</groupId>
             <artifactId>jsweet-transpiler</artifactId>
-            <version>${jsweet.transpiler.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jsweet.ext</groupId>
-                    <artifactId>typescript.java-ts.core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jsweet.ext</groupId>
-                    <artifactId>sourcemap-builder</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>3.1.0</version>
         </dependency>
 
         <dependency>
